@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+
+  db:
+    image: mariadb:latest
+    container_name: ${PROJECT_NAME}_db
+    volumes:
+      - ./source/db_data:/var/lib/mysql
+      - ./source/db_import:/data_import
+      - ./tools/import.sh:/data_import/import.sh
+    ports:
+      - "${PORT_MYSQL}:3306"
+    restart: always
+    env_file:
+      - settings.env
+
+  web:
+    container_name: ${PROJECT_NAME}_web
+    build: ./docker-web
+    volumes:
+      - ./source/web:/var/www/html
+    ports:
+      - "${PORT_WEB}:80"
+    depends_on:
+      - db
+    links:
+      - db
+    restart: always
+    env_file: settings.env
+    environment:
+      MYSQL_HOST: db
+
+  phpmyadmin:
+    container_name: ${PROJECT_NAME}_phpmyadmin
+    image: phpmyadmin/phpmyadmin:latest
+    volumes:
+      - ./files/phpmyadmin-config.php:/etc/phpmyadmin/config.user.inc.php
+    ports:
+      - "${PORT_PHPMYADMIN}:80"
+    depends_on:
+      - db
+    links:
+      - db
+    env_file: settings.env
+    environment:
+      MYSQL_HOST: db

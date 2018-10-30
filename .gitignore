@@ -1,0 +1,8 @@
+settings.env
+source/web/*
+source/db_import/*
+source/db_data/*
+
+!source/web/.gitkeep
+!source/db_data/.gitkeep
+!source/db_import/.gitkeep
